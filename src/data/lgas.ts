@@ -1,8 +1,26 @@
 export const lgas = [
-    { name: "Kaduna North", coordinates: [10.5300, 7.4400] },
-    { name: "Kaduna South", coordinates: [10.4800, 7.4200] },
-    { name: "Zaria", coordinates: [11.0855, 7.7190] },
-    { name: "Kafanchan", coordinates: [9.5833, 8.3167] },
-    // Add all 23 LGAs
-  ];
-  
+  { name: "Birnin Gwari", coordinates: [10.6657, 6.5405] },
+  { name: "Chikun", coordinates: [10.5231, 7.4062] },
+  { name: "Giwa", coordinates: [11.3805, 7.4054] },
+  { name: "Igabi", coordinates: [10.7911, 7.4847] },
+  { name: "Ikara", coordinates: [11.1759, 8.2223] },
+  { name: "Jaba", coordinates: [9.4913, 8.0982] },
+  { name: "Jema'a", coordinates: [9.4904, 8.2845] },
+  { name: "Kachia", coordinates: [9.8696, 7.9536] },
+  { name: "Kaduna North", coordinates: [10.5300, 7.4400] },
+  { name: "Kaduna South", coordinates: [10.4800, 7.4200] },
+  { name: "Kagarko", coordinates: [9.4784, 7.6983] },
+  { name: "Kajuru", coordinates: [10.3001, 7.7502] },
+  { name: "Kaura", coordinates: [9.6504, 8.4504] },
+  { name: "Kauru", coordinates: [10.6047, 8.1235] },
+  { name: "Kubau", coordinates: [10.9676, 7.9326] },
+  { name: "Kudan", coordinates: [11.2956, 7.7065] },
+  { name: "Lere", coordinates: [10.6673, 8.5720] },
+  { name: "Makarfi", coordinates: [11.3870, 7.9181] },
+  { name: "Sabon Gari", coordinates: [11.1277, 7.6773] },
+  { name: "Sanga", coordinates: [9.3901, 8.0421] },
+  { name: "Soba", coordinates: [10.9295, 7.9516] },
+  { name: "Zangon Kataf", coordinates: [9.7833, 8.2667] },
+  { name: "Zaria", coordinates: [11.0855, 7.7190] },
+  { name: "Kafanchan", coordinates: [9.5833, 8.3167] }
+];
