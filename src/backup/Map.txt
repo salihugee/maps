@@ -2,19 +2,20 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, LayersControl, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { companies } from "./data/companies";
 import { lgas } from "./data/lgas";
 import { fetchTemperature } from "./utils/weather";
 import { commodityPrices } from "./data/commodity";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import KmlLayer from "react-leaflet-kml";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { irrigationSchemes } from "./data/irrigationSchemes";
 import { lgacrops } from "./data/lgacrops";
 import markets from "./data/markets"; // Import markets data
-import Sidebar from "./components/Sidebar";
-import IrrigationSchemesToggleControl from "./components/IrrigationSchemes";
+
 
 // Custom Control Component for Clustering Toggle
 const ClusteringToggleControl: React.FC<{
@@ -63,22 +64,48 @@ const ClusteringToggleControl: React.FC<{
   return null;
 };
 
-// Function to load and add KML layer
-const AddKmlLayer = () => {
+const IrrigationSchemesToggleControl: React.FC<{
+  showIrrigationSchemes: boolean;
+  setShowIrrigationSchemes: (enabled: boolean) => void;
+}> = ({ showIrrigationSchemes, setShowIrrigationSchemes }) => {
   const map = useMap();
 
   useEffect(() => {
-    const fetchKml = async () => {
-      const response = await fetch("/kaduna.kml"); // Path to the KML file in the public folder
-      const kmlText = await response.text();
-      const parser = new DOMParser();
-      const kml = parser.parseFromString(kmlText, "text/xml");
-      const kmlLayer = new L.KML(kml);
-      map.addLayer(kmlLayer);
-    };
+    const controlDiv = L.DomUtil.create("div", "leaflet-control leaflet-bar");
+    controlDiv.style.background = "white";
+    controlDiv.style.padding = "10px";
+    controlDiv.style.borderRadius = "8px";
+    controlDiv.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.3)";
+    controlDiv.style.fontFamily = "Arial, sans-serif";
+    controlDiv.style.fontSize = "14px";
+    controlDiv.style.color = "#333";
 
-    fetchKml();
-  }, [map]);
+    const label = L.DomUtil.create("label", "", controlDiv);
+    label.style.display = "flex";
+    label.style.alignItems = "center";
+    label.style.gap = "8px";
+
+    const checkbox = L.DomUtil.create("input", "", label) as HTMLInputElement;
+    checkbox.type = "checkbox";
+    checkbox.checked = showIrrigationSchemes;
+    checkbox.style.width = "16px";
+    checkbox.style.height = "16px";
+    checkbox.style.cursor = "pointer";
+    checkbox.onchange = () => setShowIrrigationSchemes(checkbox.checked);
+
+    const text = L.DomUtil.create("span", "", label);
+    text.innerText = "Irrigation Schemes";
+    text.style.color = "#333"; // Ensure text is visible
+    text.style.cursor = "pointer";
+
+    const customControl = L.control({ position: "topright" });
+    customControl.onAdd = () => controlDiv;
+    customControl.addTo(map);
+
+    return () => {
+      customControl.remove();
+    };
+  }, [showIrrigationSchemes, setShowIrrigationSchemes, map]);
 
   return null;
 };
@@ -199,6 +226,243 @@ const createClusterCustomIcon = (cluster: any) => {
   });
 };
 
+interface SidebarProps {
+  displayMode: string;
+  setDisplayMode: (mode: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  selectedCommodity: string;
+  setSelectedCommodity: (commodity: string) => void;
+  categories: string[];
+  commodityTypes: string[];
+  selectedCrop: string;
+  setSelectedCrop: (crop: string) => void;
+  selectedLgaCrops: { lga: string; crops: string[] } | null;
+  selectedMarket: {
+    name: string;
+    lga: string;
+    latitude: number;
+    longitude: number;
+    operatingDays: string;
+    description: string;
+    commodities: string[];
+  } | null;
+  selectedMarketCommodity: string;
+  setSelectedMarketCommodity: (commodity: string) => void;
+  selectedCompany: Company | null; // Add selectedCompany
+}
+
+const Sidebar: React.FC<SidebarProps & { selectedLgaCrops: { lga: string; crops: string[] } | null }> = ({
+  displayMode,
+  setDisplayMode,
+  selectedCategory,
+  setSelectedCategory,
+  categories,
+  selectedCommodity,
+  setSelectedCommodity,
+  commodityTypes,
+  selectedCrop,
+  setSelectedCrop,
+  selectedLgaCrops, // Add selectedLgaCrops as a prop
+  selectedMarket, // Add selectedMarket as a prop
+  selectedMarketCommodity, // Add selectedMarketCommodity as a prop
+  setSelectedMarketCommodity, // Add setSelectedMarketCommodity as a prop
+  selectedCompany, // Add selectedCompany as a prop
+}) => {
+  return (
+    <div className="sidebar w-1/5 p-4 bg-gray-800 shadow-lg border-r border-gray-700 flex flex-col space-y-4">
+      {/* Display Mode Buttons */}
+      <button
+        className={`w-full px-3 py-1 rounded-md shadow-sm text-sm transition-all ${
+          displayMode === "companies"
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-300"
+        }`}
+        onClick={() => setDisplayMode("companies")}
+      >
+        🏢 Companies
+      </button>
+      <button
+        className={`w-full px-3 py-1 rounded-md shadow-sm text-sm transition-all ${
+          displayMode === "temperature"
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-300"
+        }`}
+        onClick={() => setDisplayMode("temperature")}
+      >
+        🌡 Weather Report
+      </button>
+      <button
+        className={`w-full px-3 py-1 rounded-md shadow-sm text-sm transition-all ${
+          displayMode === "commodityPrices"
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-300"
+        }`}
+        onClick={() => setDisplayMode("commodityPrices")}
+      >
+        📊 Commodity Prices
+      </button>
+      <button
+        className={`w-full px-3 py-1 rounded-md shadow-sm text-sm transition-all ${
+          displayMode === "crops"
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-300"
+        }`}
+        onClick={() => setDisplayMode("crops")}
+      >
+        🌾 Crops
+      </button>
+      <button
+        className={`w-full px-3 py-1 rounded-md shadow-sm text-sm transition-all ${
+          displayMode === "markets"
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-300"
+        }`}
+        onClick={() => setDisplayMode("markets")}
+      >
+        🏬 Major Markets
+      </button>
+
+      {/* Category Filter for Companies */}
+      {displayMode === "companies" && (
+        <div className="space-y-2">
+          <h3 className="text-md font-semibold text-gray-300">Filter by Category</h3>
+          <select
+            className="w-full border border-gray-600 rounded-md p-2 bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Commodity Filter */}
+      {displayMode === "commodityPrices" && (
+        <div className="space-y-2">
+          <h3 className="text-md font-semibold text-gray-300">Filter by Commodity</h3>
+          <select
+            className="w-full border border-gray-600 rounded-md p-2 bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+            value={selectedCommodity}
+            onChange={(e) => setSelectedCommodity(e.target.value)}
+          >
+            {commodityTypes.map((commodity) => (
+              <option key={commodity} value={commodity}>
+                {commodity}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Crop Filter */}
+      {displayMode === "crops" && (
+        <div className="space-y-2">
+          <h3 className="text-md font-semibold text-gray-300">Filter by Crop</h3>
+          <select
+            className="w-full border border-gray-600 rounded-md p-2 bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+            value={selectedCrop}
+            onChange={(e) => setSelectedCrop(e.target.value)}
+          >
+            <option value="All">All Crops</option>
+            {[...new Set(lgacrops.flatMap((lga) => lga.crops))].map((crop) => (
+              <option key={crop} value={crop}>
+                {crop}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Display Selected LGA and Crops */}
+      {displayMode === "crops" && selectedLgaCrops && (
+        <div className="mt-4 p-4 bg-gray-700 rounded-md shadow">
+          <h3 className="text-lg font-bold text-white">{selectedLgaCrops.lga}</h3>
+          <ul className="mt-2 text-sm text-gray-300">
+            {selectedLgaCrops.crops.map((crop, index) => (
+              <li key={index}>🌾 {crop}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Display Selected Market Details */}
+      {displayMode === "markets" && selectedMarket && (
+        <div className="mt-4 p-4 bg-gray-700 rounded-md shadow">
+          <h3 className="text-lg font-bold text-white">{selectedMarket.name}</h3>
+          <p className="text-sm text-gray-300">
+            <strong>LGA:</strong> {selectedMarket.lga}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Operating Days:</strong> {selectedMarket.operatingDays}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Description:</strong> {selectedMarket.description}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Commodities:</strong>
+          </p>
+          <ul className="mt-2 text-sm text-gray-300">
+            {selectedMarket.commodities.map((commodity, index) => (
+              <li key={index}>🌾 {commodity}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Commodity Filter for Markets */}
+      {displayMode === "markets" && (
+        <div className="space-y-2">
+          <h3 className="text-md font-semibold text-gray-300">Filter by Commodity</h3>
+          <select
+            className="w-full border border-gray-600 rounded-md p-2 bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+            value={selectedMarketCommodity}
+            onChange={(e) => setSelectedMarketCommodity(e.target.value)}
+          >
+            <option value="All">All Commodities</option>
+            {[...new Set(markets.flatMap((market) => market.commodities))].map(
+              (commodity) => (
+                <option key={commodity} value={commodity}>
+                  {commodity}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+      )}
+
+      {/* Display Selected Company Details */}
+      {displayMode === "companies" && selectedCompany && (
+        <div className="mt-4 p-4 bg-gray-700 rounded-md shadow">
+          <h3 className="text-lg font-bold text-white">{selectedCompany.name}</h3>
+          <p className="text-sm text-gray-300">
+            <strong>Category:</strong> {selectedCompany.category}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Office Address:</strong> {selectedCompany.officeAddress}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Contact Person:</strong> {selectedCompany.contactPerson}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Phone Number:</strong> {selectedCompany.phoneNumber}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Email/Website:</strong> {selectedCompany.emailWebsite}
+          </p>
+          <p className="text-sm text-gray-300">
+            <strong>Commodities:</strong> {selectedCompany.commodity.join(", ")}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CenterMapOnClick: React.FC<{ position: [number, number] }> = ({ position }) => {
   const map = useMap();
 
@@ -212,23 +476,6 @@ const CenterMapOnClick: React.FC<{ position: [number, number] }> = ({ position }
 };
 
 const Map = () => {
-  const [companies, setCompanies] = useState<any[]>([]); // State to store companies data
-
-  // Fetch companies data from the server
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch("http://localhost:5001/api/companies"); // Replace with your backend API URL
-        const data = await response.json();
-        setCompanies(data);
-      } catch (error) {
-        console.error("Error fetching companies:", error);
-      }
-    };
-
-    fetchCompanies();
-  }, []);
-
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCommodity, setSelectedCommodity] = useState("All");
   const [temperatures, setTemperatures] = useState<{ [key: string]: number | null }>({});
@@ -340,8 +587,6 @@ const Map = () => {
             <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
           </LayersControl.BaseLayer>
         </LayersControl>
-
-        <AddKmlLayer />
 
         {/* Enable Irrigation Schemes Checkbox Only in Companies Mode */}
         {displayMode === "companies" && (

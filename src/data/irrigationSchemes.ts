@@ -1,0 +1,58 @@
+export const irrigationSchemes = [
+  {
+    name: "KADUNA GARDEN IRRIGATION SCHEME",
+    lga: "KADUNA SOUTH",
+    location: "BARNAWA",
+    size: "34 Hectares",
+    coordinates: [10.492519037819736, 7.431041389903039],
+  },
+  {
+    name: "KUFANA IRRIGATION SCHEME",
+    lga: "KAJURU",
+    location: "KUFANA",
+    size: "9 Hectares",
+    coordinates: [10.304656295109908, 7.740110034007024],
+  },
+  {
+    name: "MISHIGIN KAYA IRRIGATION SCHEME",
+    lga: "GIWA LGA",
+    location: "MISHIGIN KAYA",
+    size: "47 Hectares",
+    coordinates: [11.247300522571027, 7.349657513222138],
+  },
+  {
+    name: "GALMA IRRIGATION SCHEME SITE A",
+    lga: "ZARIA LGA",
+    location: "GALMA",
+    size: "62 Hectares",
+    coordinates: [11.072745842116163, 7.744704654185192],
+  },
+  {
+    name: "GALMA IRRIGATION SCHEME SITE B",
+    lga: "ZARIA LGA",
+    location: "GALMA",
+    size: "16 Hectares",
+    coordinates: [11.0781689695659, 7.741060028217789],
+  },
+  {
+    name: "JAGINDI COMMUNITY BASED IRRIGATION SCHEME",
+    lga: "JEMA'A LGA",
+    location: "JAGINDI",
+    size: "73 Hectares",
+    coordinates: [9.364447748261352, 8.215926240717542],
+  },
+  {
+    name: "KUKUM DAJI IRRIGATION SCHEME",
+    lga: "JEMA'A LGA",
+    location: "KUKUM DAJI",
+    size: "33 Hectares",
+    coordinates: [9.615257732866288, 8.351532057614396],
+  },
+  {
+    name: "KANGIMI IRRIGATION SCHEME",
+    lga: "IGABI LGA",
+    location: "KANGIMI",
+    size: "85 Hectares",
+    coordinates: [10.6165965056162, 7.589669222751055],
+  },
+];

@@ -1,0 +1,203 @@
+// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\Navigation.jsx
+
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+
+const navLinkClass = ({ isActive }) =>
+    isActive
+        ? 'bg-green-600 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all'
+        : 'bg-gray-700 text-gray-300 px-3 py-1 rounded-md shadow-sm text-sm transition-all';
+
+const Navigation = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleLinkClick = () => {
+        setIsMenuOpen(false);
+    };
+
+    const toggleDropdown = (dropdownName) => {
+        setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
+    };
+
+    return (
+        <div className="navbar bg-base-100 shadow-sm z-50">
+            <div className="flex justify-between items-center w-full">
+                <NavLink to="/" className="btn btn-ghost normal-case text-xl text-green-700">AgriPlatform</NavLink>
+
+                {/* Hamburger Icon for Mobile */}
+                <button
+                    className="lg:hidden text-gray-700 focus:outline-none"
+                    onClick={toggleMenu}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M4 6h16M4 12h16m-7 6h7"
+                        />
+                    </svg>
+                </button>
+
+                {/* Desktop Menu */}
+                <ul className="hidden lg:flex menu menu-horizontal px-1 space-x-1">
+                    <li>
+                        <NavLink to="/" className={navLinkClass}>Home</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/about" className={navLinkClass}>About</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/maps" className={navLinkClass}>GIS Dashboard</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'farmingResources'}
+                            onClick={() => toggleDropdown('farmingResources')}
+                        >
+                            <summary className="cursor-pointer">Farming Resources</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                
+                                <li><NavLink to="/resources-training" className={navLinkClass} onClick={handleLinkClick}>Resources & Training</NavLink></li>
+                                <li><NavLink to="/precision-farming" className={navLinkClass} onClick={handleLinkClick}>Precision Farming</NavLink></li>
+                                <li><NavLink to="/seasonal-farming-tips" className={navLinkClass} onClick={handleLinkClick}>Seasonal Farming Tips</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'marketWeather'}
+                            onClick={() => toggleDropdown('marketWeather')}
+                        >
+                            <summary className="cursor-pointer">Market & Weather</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/market" className={navLinkClass} onClick={handleLinkClick}>Market Information</NavLink></li>
+                                <li><NavLink to="/weather" className={navLinkClass} onClick={handleLinkClick}>Weather Information</NavLink></li>
+                                <li><NavLink to="/drone-imagery" className={navLinkClass} onClick={handleLinkClick}>Drone Imagery</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'stakeholdersExperts'}
+                            onClick={() => toggleDropdown('stakeholdersExperts')}
+                        >
+                            <summary className="cursor-pointer">Stakeholders & Experts</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/experts" className={navLinkClass} onClick={handleLinkClick}>Agricultural Experts</NavLink></li>
+                                <li><NavLink to="/stakeholders" className={navLinkClass} onClick={handleLinkClick}>Stakeholders</NavLink></li>
+                                <li><NavLink to="/stakeholders-map" className={navLinkClass} onClick={handleLinkClick}>Stakeholders Map</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'communitySupport'}
+                            onClick={() => toggleDropdown('communitySupport')}
+                        >
+                            <summary className="cursor-pointer">Community & Support</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/farmers-forum" className={navLinkClass} onClick={handleLinkClick}>Farmers Forum</NavLink></li>
+                                <li><NavLink to="/faqs" className={navLinkClass} onClick={handleLinkClick}>FAQs</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                </ul>
+            </div>
+
+            {/* Mobile Menu */}
+            {isMenuOpen && (
+                <ul className="lg:hidden menu menu-vertical px-1 space-y-1">
+                    <li>
+                        <NavLink to="/" className={navLinkClass} onClick={handleLinkClick}>Home</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/about" className={navLinkClass} onClick={handleLinkClick}>About</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/maps" className={navLinkClass} onClick={handleLinkClick}>GIS Dashboard</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard" className={navLinkClass} onClick={handleLinkClick}>Dashboard</NavLink>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'farmingResources'}
+                            onClick={() => toggleDropdown('farmingResources')}
+                        >
+                            <summary className="cursor-pointer">Farming Resources</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/tips" className={navLinkClass} onClick={handleLinkClick}>Farming Tips</NavLink></li>
+                                <li><NavLink to="/resources-training" className={navLinkClass} onClick={handleLinkClick}>Resources & Training</NavLink></li>
+                                <li><NavLink to="/precision-farming" className={navLinkClass} onClick={handleLinkClick}>Precision Farming</NavLink></li>
+                                <li><NavLink to="/seasonal-farming-tips" className={navLinkClass} onClick={handleLinkClick}>Seasonal Farming Tips</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'marketWeather'}
+                            onClick={() => toggleDropdown('marketWeather')}
+                        >
+                            <summary className="cursor-pointer">Market & Weather</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/market" className={navLinkClass} onClick={handleLinkClick}>Market Information</NavLink></li>
+                                <li><NavLink to="/weather" className={navLinkClass} onClick={handleLinkClick}>Weather Information</NavLink></li>
+                                <li><NavLink to="/drone-imagery" className={navLinkClass} onClick={handleLinkClick}>Drone Imagery</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'stakeholdersExperts'}
+                            onClick={() => toggleDropdown('stakeholdersExperts')}
+                        >
+                            <summary className="cursor-pointer">Stakeholders & Experts</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/experts" className={navLinkClass} onClick={handleLinkClick}>Agricultural Experts</NavLink></li>
+                                <li><NavLink to="/stakeholders" className={navLinkClass} onClick={handleLinkClick}>Stakeholders</NavLink></li>
+                                <li><NavLink to="/stakeholders-map" className={navLinkClass} onClick={handleLinkClick}>Stakeholders Map</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li>
+                        <details
+                            className="group relative"
+                            open={activeDropdown === 'communitySupport'}
+                            onClick={() => toggleDropdown('communitySupport')}
+                        >
+                            <summary className="cursor-pointer">Community & Support</summary>
+                            <ul className="bg-base-100 rounded-t-none p-2 space-y-1 absolute">
+                                <li><NavLink to="/farmers-forum" className={navLinkClass} onClick={handleLinkClick}>Farmers Forum</NavLink></li>
+                                <li><NavLink to="/faqs" className={navLinkClass} onClick={handleLinkClick}>FAQs</NavLink></li>
+                            </ul>
+                        </details>
+                    </li>
+                </ul>
+            )}
+        </div>
+    );
+};
+
+export default Navigation;
