@@ -4,16 +4,24 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
+
+interface ForumTopic {
+    id: number;
+    title: string;
+    author: string;
+    date: string;
+    comments: number;
+}
 
 // Animation variants
-const cardVariants = {
+const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
 };
 
 // Dummy data for resources - replace with your actual data source
-const forumTopics = [
+const forumTopics: ForumTopic[] = [
     { id: 1, title: 'Best practices for maize cultivation', author: 'John Doe', date: '2024-07-28', comments: 15 },
     { id: 2, title: 'Managing poultry diseases in harmattan', author: 'Alice Smith', date: '2024-07-25', comments: 22 },
     { id: 3, title: 'Market prices for rice in Kano', author: 'Usman Bello', date: '2024-07-20', comments: 18 },
@@ -21,7 +29,7 @@ const forumTopics = [
     { id: 5, title: 'Government agricultural policies', author: 'David Okoro', date: '2024-07-15', comments: 30 },
 ];
 
-const FarmersForum = () => {
+const FarmersForum: React.FC = () => {
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-green-600 flex items-center gap-2">
@@ -38,7 +46,7 @@ const FarmersForum = () => {
                 variants={{
                     visible: {
                         transition: {
-                            staggerChildren: 0.2, // Stagger the animation of children
+                            staggerChildren: 0.2,
                         },
                     },
                 }}

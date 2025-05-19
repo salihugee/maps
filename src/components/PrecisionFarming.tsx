@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactElement } from 'react';
 import { Zap, MapPin, Droplet, Activity, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+interface Technique {
+    id: number;
+    name: string;
+    description: string;
+    icon: ReactElement;
+}
+
 // Dummy data for precision farming techniques (replace with actual data)
-const dummyTechniques = [
+const dummyTechniques: Technique[] = [
     {
         id: 1,
         name: 'GPS-Guided Farming',
@@ -38,15 +45,15 @@ const dummyTechniques = [
     },
 ];
 
-const PrecisionFarming = () => {
-    const [techniques, setTechniques] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
+const PrecisionFarming: React.FC = () => {
+    const [techniques, setTechniques] = useState<Technique[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     useEffect(() => {
         // Simulate fetching data from an API
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
                 setTechniques(dummyTechniques); // Use dummy data

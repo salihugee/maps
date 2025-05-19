@@ -17,7 +17,17 @@ import FAQs from './FAQCard';
 import Footer from './Footer';
 import NotFound from './NotFound';
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
+    const WelcomeComponent: React.FC = () => (
+        <div>
+            <h2 className="text-3xl font-bold mb-4">Welcome to the Agriculture App</h2>
+            <p className="text-gray-700">
+                Explore farming tips, best practices, and resources to improve your agricultural
+                productivity.
+            </p>
+        </div>
+    );
+
     return (
         <Router>
             <div className="min-h-screen bg-gray-100">
@@ -30,18 +40,7 @@ const HomePage = () => {
                 {/* Main Content */}
                 <main className="container mx-auto px-4 py-6">
                     <Routes>
-                        <Route
-                            path="/"
-                            element={
-                                <div>
-                                    <h2 className="text-3xl font-bold mb-4">Welcome to the Agriculture App</h2>
-                                    <p className="text-gray-700">
-                                        Explore farming tips, best practices, and resources to improve your agricultural
-                                        productivity.
-                                    </p>
-                                </div>
-                            }
-                        />
+                        <Route path="/" element={<WelcomeComponent />} />
                         <Route path="/tips" element={<SeasonalFarmingTips />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/stakeholders" element={<Stakeholders />} />

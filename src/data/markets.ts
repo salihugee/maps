@@ -123,7 +123,7 @@ export const markets = [
         longitude: 7.4403,
         operatingDays: "Mondays",
         description: "Rural market for grains and livestock",
-        commodities: ["Sorghum", "Millet", "Cowpea", "Groundnut"],
+        commodities: ["Maize", "Sorghum", "Millet", "Cowpea", "Groundnut"],
     },
     {
         name: "Zaria Central Market",

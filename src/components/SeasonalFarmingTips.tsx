@@ -5,7 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-const dummyTips = [
+interface FarmingTip {
+    id: number;
+    season: string;
+    category: string;
+    title: string;
+    content: string;
+    date: string;
+}
+
+const dummyTips: FarmingTip[] = [
     {
         id: 1,
         season: 'Rainy Season',
@@ -72,14 +81,20 @@ const dummyTips = [
     },
 ];
 
-const renderSeasonButton = (season, label, selectedSeason, setSelectedSeason) => {
+const renderSeasonButton = (
+    season: string | null,
+    label: string,
+    selectedSeason: string | null,
+    setSelectedSeason: (season: string | null) => void
+): JSX.Element => {
     return (
         <Button
             onClick={() => setSelectedSeason(season)}
-            className={`px-4 py-2 rounded ${selectedSeason === season
+            className={`px-4 py-2 rounded ${
+                selectedSeason === season
                     ? 'bg-green-600 text-white hover:bg-green-700'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+            }`}
             aria-pressed={selectedSeason === season}
         >
             {label}
@@ -87,20 +102,20 @@ const renderSeasonButton = (season, label, selectedSeason, setSelectedSeason) =>
     );
 };
 
-const SeasonalFarmingTips = () => {
-    const [tips, setTips] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedSeason, setSelectedSeason] = useState(null);
+const SeasonalFarmingTips: React.FC = () => {
+    const [tips, setTips] = useState<FarmingTip[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
 
-    const seasons = useMemo(() => {
+    const seasons = useMemo<string[]>(() => {
         const sourceData = tips.length > 0 ? tips : dummyTips;
         return [...new Set(sourceData.map((tip) => tip.season))];
     }, [tips]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             setLoading(true);
             setError(null);
             try {
@@ -116,7 +131,7 @@ const SeasonalFarmingTips = () => {
         fetchData();
     }, []);
 
-    const filteredTips = useMemo(() => {
+    const filteredTips = useMemo<FarmingTip[]>(() => {
         return tips.filter((tip) => {
             const searchMatch =
                 tip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

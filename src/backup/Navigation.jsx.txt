@@ -1,26 +1,32 @@
-// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\Navigation.jsx
+// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\Navigation.tsx
 
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, NavLinkProps } from 'react-router-dom';
 
-const navLinkClass = ({ isActive }) =>
+interface NavLinkClassProps {
+    isActive: boolean;
+}
+
+type DropdownType = 'farmingResources' | 'marketWeather' | 'stakeholdersExperts' | 'communitySupport' | null;
+
+const navLinkClass = ({ isActive }: NavLinkClassProps): string =>
     isActive
         ? 'bg-green-600 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all'
         : 'bg-gray-700 text-gray-300 px-3 py-1 rounded-md shadow-sm text-sm transition-all';
 
-const Navigation = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeDropdown, setActiveDropdown] = useState(null);
+const Navigation: React.FC = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const [activeDropdown, setActiveDropdown] = useState<DropdownType>(null);
 
-    const toggleMenu = () => {
+    const toggleMenu = (): void => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleLinkClick = () => {
+    const handleLinkClick = (): void => {
         setIsMenuOpen(false);
     };
 
-    const toggleDropdown = (dropdownName) => {
+    const toggleDropdown = (dropdownName: DropdownType): void => {
         setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
     };
 

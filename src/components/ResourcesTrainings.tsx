@@ -6,20 +6,30 @@ import {
     Newspaper,
     FileText,
     Video,
+    LucideIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 // Animation variants
-const cardVariants = {
+const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeInOut' } },
 };
 
+interface Resource {
+    id: number;
+    type: 'PDF' | 'Video' | 'Podcast' | 'Article' | 'Training';
+    title: string;
+    description: string;
+    url: string;
+    icon: LucideIcon;
+}
+
 // Dummy data for training resources
-const trainingResources = [
+const trainingResources: Resource[] = [
     {
         id: 1,
         type: 'PDF',
@@ -62,7 +72,7 @@ const trainingResources = [
     },
 ];
 
-const ResourcesAndTraining = () => {
+const ResourcesAndTraining: React.FC = () => {
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-green-600 flex items-center gap-2">

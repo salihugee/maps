@@ -1,0 +1,85 @@
+I'll continue updating the weather utility file and other files that contain API URLs. Let's update the weather.ts file: 
+```
+
+
+Made changes.
+
+
+```
+
+```
+
+
+Made changes.
+
+
+```
+
+
+Let's also check the companies page: 
+
+Let's create a services directory to handle all API calls and use environment variables: 
+
+Made changes.
+
+
+
+Now let's update the Map component to use the new API service: 
+```
+
+
+Made changes.
+
+
+```
+
+
+
+
+Also, let's create a .env.example file for reference: 
+
+Made changes.
+
+
+
+
+
+Now let's add the .env file to .gitignore to ensure sensitive information isn't committed: 
+```
+
+
+Made changes.
+
+
+```
+
+
+I've made several changes to properly handle environment variables:
+
+1. Created/Updated .env file with:
+   - API URLs
+   - API keys
+   - Other configuration values
+
+2. Created .env.example as a template for other developers
+
+3. Created a new `services/api.ts` file to centralize API calls with:
+   - Company CRUD operations
+   - Consistent error handling
+   - Environment variable usage
+
+4. Updated the weather utility to use environment variables
+
+5. Updated the Map component to use the new API service
+
+6. Added proper TypeScript types for environment variables
+
+7. Added .env to .gitignore for security
+
+To use these changes, developers will need to:
+
+1. Copy .env.example to .env
+2. Fill in their own API keys and configuration
+3. Use the api service for making API calls
+
+Let me know if you need any adjustments or have questions about the implementation!

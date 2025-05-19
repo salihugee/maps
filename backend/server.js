@@ -47,11 +47,28 @@ app.get("/api/irrigation-schemes", async (req, res) => {
   }
 });
 
+// API endpoint to fetch lga_crops
+app.get("/api/lga_crops", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM lga_crops");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({ message: "Backend Running" });
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, '0.0.0.0', (error) => {
+  if (error) {
+    console.error('Error starting server:', error.message);
+    process.exit(1);
+  }
+  console.log(`Server is running on port ${PORT}`);
+});

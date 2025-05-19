@@ -8,36 +8,48 @@ import { cn } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-const StakeholdersMap = () => {
-    const [stakeholders, setStakeholders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedType, setSelectedType] = useState(null);
-    const mapRef = useRef(null);
-    const [mapInstance, setMapInstance] = useState(null);
+interface Stakeholder {
+    id: number;
+    name: string;
+    category: string;
+    contact_person: string;
+    phone_number: string;
+    email_website: string;
+    office_address: string;
+    website?: string;
+    coordinates: [number, number];
+}
+
+const StakeholdersMap: React.FC = () => {
+    const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedType, setSelectedType] = useState<string | null>(null);
+    const mapRef = useRef<HTMLDivElement>(null);
+    const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
     // Filter unique stakeholder types dynamically
-    const stakeholderTypes = useMemo(() => {
-            if (!stakeholders || stakeholders.length === 0) return [];
-            const types = [...new Set(stakeholders.map((s) => s.category))];
-            return types;
-        }, [stakeholders]);
+    const stakeholderTypes = useMemo<string[]>(() => {
+        if (!stakeholders || stakeholders.length === 0) return [];
+        const types = [...new Set(stakeholders.map((s) => s.category))];
+        return types;
+    }, [stakeholders]);
 
     const filteredStakeholders = stakeholders.filter((stakeholder) => {
         const searchMatch =
             stakeholder.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            stakeholder.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase());
+            stakeholder.contact_person?.toLowerCase().includes(searchTerm.toLowerCase());
         const typeMatch = !selectedType || stakeholder.category === selectedType;
         return searchMatch && typeMatch;
     });
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 const response = await fetch('http://localhost:5001/api/companies');
                 if (!response.ok) throw new Error('Failed to fetch stakeholders');
-                const data = await response.json();
+                const data: Stakeholder[] = await response.json();
                 setStakeholders(data);
             } catch (err) {
                 setError('An error occurred while fetching stakeholders.');

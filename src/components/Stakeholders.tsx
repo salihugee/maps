@@ -6,26 +6,27 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
-// import {
-//     id,
-//     name,
-//     category,
-//     contact_person,
-//     designation,
-//     phone_number,
-//     email_website,
-//     office_address,
-// } from 'lucide-react';
+interface Stakeholder {
+    id: number;
+    name: string;
+    category: string;
+    contact_person: string;
+    designation: string;
+    phone_number: string;
+    email_website: string;
+    office_address: string;
+    coordinates: string;
+}
 
-const Stakeholders = () => {
-    const [stakeholders, setStakeholders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedType, setSelectedType] = useState(null);
+const Stakeholders: React.FC = () => {
+    const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedType, setSelectedType] = useState<string | null>(null);
 
     // Get unique stakeholder types for filter buttons
-    const stakeholderTypes = useMemo(() => {
+    const stakeholderTypes = useMemo<string[]>(() => {
         if (!stakeholders || stakeholders.length === 0) return [];
         const types = [...new Set(stakeholders.map((s) => s.category))];
         return types;
@@ -33,7 +34,7 @@ const Stakeholders = () => {
 
     // Fetch stakeholders from API
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 const response = await fetch('http://localhost:5001/api/companies');
 
@@ -41,7 +42,7 @@ const Stakeholders = () => {
                     throw new Error(`Failed to fetch stakeholders: ${response.status}`);
                 }
 
-                const data = await response.json();
+                const data: Stakeholder[] = await response.json();
                 console.log('Fetched stakeholders:', data);
 
                 if (Array.isArray(data)) {
@@ -51,7 +52,7 @@ const Stakeholders = () => {
                 }
             } catch (err) {
                 console.error('Fetch error:', err);
-                setError(err.message || 'An error occurred while fetching stakeholders.');
+                setError(err instanceof Error ? err.message : 'An error occurred while fetching stakeholders.');
             } finally {
                 setLoading(false);
             }
@@ -61,7 +62,7 @@ const Stakeholders = () => {
     }, []);
 
     // Filter stakeholders based on search + category
-    const filteredStakeholders = useMemo(() => {
+    const filteredStakeholders = useMemo<Stakeholder[]>(() => {
         if (!stakeholders || stakeholders.length === 0) return [];
 
         return stakeholders.filter((stakeholder) => {
@@ -76,7 +77,7 @@ const Stakeholders = () => {
     }, [stakeholders, searchTerm, selectedType]);
 
     // Render filter buttons
-    const renderFilterButton = (type, label) => (
+    const renderFilterButton = (type: string | null, label: string): JSX.Element => (
         <Button
             key={type === null ? 'all' : type}
             variant={selectedType === type ? 'default' : 'outline'}

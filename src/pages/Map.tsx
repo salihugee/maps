@@ -2,19 +2,21 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, LayersControl, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { lgas } from "./data/lgas";
-import { fetchTemperature } from "./utils/weather";
-import { commodityPrices } from "./data/commodity";
+import { lgas } from "../data/lgas";
+import { getWeatherData } from "../services/weather";
+import { getCompanies } from "../services/api";
+import { commodityPrices } from "../data/commodity";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { irrigationSchemes } from "./data/irrigationSchemes";
-import { lgacrops } from "./data/lgacrops";
-import markets from "./data/markets"; // Import markets data
-import Sidebar from "./components/Sidebar";
-import IrrigationSchemesToggleControl from "./components/IrrigationSchemes";
+import { irrigationSchemes } from "../data/irrigationSchemes";
+import { lgacrops } from "../data/lgacrops";
+import markets from "../data/markets";
+import Sidebar from "../components/Sidebar";
+import IrrigationSchemesToggleControl from "../components/IrrigationSchemes";
+// import { Company } from "../types";
 
 // Custom Control Component for Clustering Toggle
 const ClusteringToggleControl: React.FC<{
@@ -190,7 +192,7 @@ const marketIcon = L.icon({
   popupAnchor: [0, -32], // Position the popup relative to the icon
 });
 
-const createClusterCustomIcon = (cluster: any) => {
+const createClusterCustomIcon = (cluster: L.MarkerCluster) => {
   const count = cluster.getChildCount(); // Get the number of markers in the cluster
   return L.divIcon({
     html: `<div style="background-color: #4CAF50; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">${count}</div>`,
@@ -212,22 +214,53 @@ const CenterMapOnClick: React.FC<{ position: [number, number] }> = ({ position }
 };
 
 const Map = () => {
-  const [companies, setCompanies] = useState<any[]>([]); // State to store companies data
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
-  // Fetch companies data from the server
+  // Fetch companies data from the server with retry logic
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/companies"); // Replace with your backend API URL
-        const data = await response.json();
-        setCompanies(data);
+        setIsLoading(true);
+        setError(null);
+        const data = await getCompanies();
+        
+        if (!data || data.length === 0) {
+          throw new Error('No companies data available');
+        }
+
+        // Validate company data
+        const validCompanies = data.filter(company => {
+          if (!company.coordinates || !Array.isArray(company.coordinates) || company.coordinates.length !== 2) {
+            console.warn(`Invalid coordinates for company: ${company.name}`);
+            return false;
+          }
+          return true;
+        });
+
+        setCompanies(validCompanies);
+        setError(null);
       } catch (error) {
         console.error("Error fetching companies:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch companies data';
+        setError(errorMessage);
+        
+        // Implement retry logic
+        if (retryCount < maxRetries) {
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+          }, 2000 * Math.pow(2, retryCount)); // Exponential backoff
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchCompanies();
-  }, []);
+  }, [retryCount]); // Add retryCount as dependency
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCommodity, setSelectedCommodity] = useState("All");
@@ -293,9 +326,10 @@ const Map = () => {
   useEffect(() => {
     if (displayMode === "temperature") {
       const fetchAllTemperatures = async () => {
-        const tempData: { [key: string]: number } = {};
+        const tempData: { [key: string]: number | null } = {};
         for (const lga of lgas) {
-          tempData[lga.name] = await fetchTemperature(lga.coordinates[0], lga.coordinates[1]);
+          const temp = await getWeatherData(lga.coordinates[0], lga.coordinates[1]);
+          tempData[lga.name] = temp;
         }
         setTemperatures(tempData);
       };
@@ -322,6 +356,17 @@ const Map = () => {
         setSelectedMarketCommodity={setSelectedMarketCommodity} // Pass setter to Sidebar
         selectedCompany={selectedCompany} // Pass selectedCompany to Sidebar
       />
+      {error && (
+        <div className="absolute top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-[9999]" role="alert">
+          <span className="font-bold">Error:</span> {error}
+        </div>
+      )}
+      {isLoading && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-lg shadow-lg z-[9999]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          <p className="mt-2 text-gray-700">Loading data...</p>
+        </div>
+      )}
       <MapContainer
         center={[10.3764, 7.7095]}
         zoom={9}
@@ -439,69 +484,21 @@ const Map = () => {
           isClusteringEnabled ? (
             <MarkerClusterGroup
               showCoverageOnHover={false}
-              iconCreateFunction={createClusterCustomIcon}
+              chunkedLoading={true}
+              maxClusterRadius={40}
+              disableClusteringAtZoom={18}
+              animate={true}
+              iconCreateFunction={(cluster) => createClusterCustomIcon(cluster)}
             >
-              {filteredCompanies.map((company) => {
-                if (!company.coordinates || company.coordinates.length !== 2) {
-                  console.warn(`Invalid coordinates for company: ${company.name}`);
-                  return null;
-                }
-
-                // Get the icon for the company's category, or use the default icon
-                const icon = categoryIcons[company.category] || categoryIcons.Default;
-
-                return (
-                  <Marker
-                    key={company.id}
-                    position={company.coordinates as [number, number]}
-                    icon={icon}
-                    eventHandlers={{
-                      click: () => {
-                        setSelectedCompany(company); // Set the selected company when marker is clicked
-                      },
-                    }}
-                  >
-                    {/* Center the map when this marker is clicked */}
-                    {selectedCompany?.id === company.id && (
-                      <CenterMapOnClick position={company.coordinates as [number, number]} />
-                    )}
-                    <Tooltip
-                      permanent
-                      direction="top"
-                      offset={[0, -20]}
-                      className="bg-white text-black p-2"
-                    >
-                      <strong className="font-bold">{company.name}</strong>
-                    </Tooltip>
-                  </Marker>
-                );
-              })}
-            </MarkerClusterGroup>
-          ) : (
-            filteredCompanies.map((company) => {
-              if (!company.coordinates || company.coordinates.length !== 2) {
-                console.warn(`Invalid coordinates for company: ${company.name}`);
-                return null;
-              }
-
-              // Get the icon for the company's category, or use the default icon
-              const icon = categoryIcons[company.category] || categoryIcons.Default;
-
-              return (
+              {filteredCompanies.map((company) => (
                 <Marker
                   key={company.id}
-                  position={company.coordinates as [number, number]}
-                  icon={icon}
+                  position={company.coordinates}
+                  icon={categoryIcons[company.category] || categoryIcons.Default}
                   eventHandlers={{
-                    click: () => {
-                      setSelectedCompany(company); // Set the selected company when marker is clicked
-                    },
+                    click: () => setSelectedCompany(company),
                   }}
                 >
-                  {/* Center the map when this marker is clicked */}
-                  {selectedCompany?.id === company.id && (
-                    <CenterMapOnClick position={company.coordinates as [number, number]} />
-                  )}
                   <Tooltip
                     permanent
                     direction="top"
@@ -511,8 +508,28 @@ const Map = () => {
                     <strong className="font-bold">{company.name}</strong>
                   </Tooltip>
                 </Marker>
-              );
-            })
+              ))}
+            </MarkerClusterGroup>
+          ) : (
+            filteredCompanies.map((company) => (
+              <Marker
+                key={company.id}
+                position={company.coordinates}
+                icon={categoryIcons[company.category] || categoryIcons.Default}
+                eventHandlers={{
+                  click: () => setSelectedCompany(company),
+                }}
+              >
+                <Tooltip
+                  permanent
+                  direction="top"
+                  offset={[0, -20]}
+                  className="bg-white text-black p-2"
+                >
+                  <strong className="font-bold">{company.name}</strong>
+                </Tooltip>
+              </Marker>
+            ))
           )
         )}
 
@@ -562,6 +579,14 @@ const Map = () => {
                 },
               }}
             >
+              <Tooltip
+                    permanent
+                    direction="top"
+                    offset={[0, -20]}
+                    className="bg-white text-black p-2"
+                  >
+                    <strong className="font-bold">{market.name}</strong>
+                  </Tooltip>
               <Popup>
                 <h3 className="text-lg font-bold">{market.name}</h3>
                 <p className="text-sm text-gray-700">

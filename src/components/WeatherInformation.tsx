@@ -6,8 +6,42 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
+interface WeatherCondition {
+    date: string;
+    high: number;
+    low: number;
+    condition: string;
+    precipitationChance: number;
+}
+
+interface WeatherRisk {
+    type: string;
+    date: string;
+    severity: 'Low' | 'Medium' | 'High';
+    description: string;
+}
+
+interface CurrentWeather {
+    lga: string;
+    temperature: number;
+    humidity: number;
+    windSpeed: number;
+    windDirection: string;
+    precipitation: string;
+    cloudCover: string;
+    location: string;
+    observationTime: string;
+}
+
+interface WeatherData {
+    current: CurrentWeather;
+    forecast: WeatherCondition[];
+    risks: WeatherRisk[];
+    tips: string[];
+}
+
 // Dummy data for weather information (replace with actual data)
-const dummyWeatherData = {
+const dummyWeatherData: WeatherData = {
     current: {
         lga: 'Kaduna South',
         temperature: 28,
@@ -79,15 +113,15 @@ const dummyWeatherData = {
     ],
 };
 
-const WeatherInformation = () => {
-    const [weatherData, setWeatherData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchLocation, setSearchLocation] = useState('');
+const WeatherInformation: React.FC = () => {
+    const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchLocation, setSearchLocation] = useState<string>('');
 
     useEffect(() => {
         // Simulate fetching data from an API
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
                 setWeatherData(dummyWeatherData); // Use dummy data
@@ -101,7 +135,7 @@ const WeatherInformation = () => {
         fetchData();
     }, []);
 
-    const getWeatherIcon = (condition) => {
+    const getWeatherIcon = (condition: string): JSX.Element => {
         switch (condition.toLowerCase()) {
             case 'sunny':
                 return <Cloud className="h-6 w-6 text-yellow-500" />;
@@ -118,7 +152,7 @@ const WeatherInformation = () => {
 
     const filteredForecast = weatherData?.forecast.filter((day) =>
         weatherData.current.location.toLowerCase().includes(searchLocation.toLowerCase())
-    );
+    ) ?? [];
 
     return (
         <div className="container mx-auto p-4 text-gray-700">

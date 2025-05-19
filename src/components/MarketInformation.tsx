@@ -6,8 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
+interface MarketItem {
+    id: number;
+    product: string;
+    price: number;
+    unit: string;
+    date: string;
+    trend: 'Increasing' | 'Decreasing' | 'Stable';
+}
+
 // Dummy data for market information (replace with actual data)
-const dummyMarketData = [
+const dummyMarketData: MarketItem[] = [
     {
         id: 1,
         product: 'Maize',
@@ -74,15 +83,15 @@ const dummyMarketData = [
     },
 ];
 
-const MarketInformation = () => {
-    const [marketData, setMarketData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
+const MarketInformation: React.FC = () => {
+    const [marketData, setMarketData] = useState<MarketItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     useEffect(() => {
         // Simulate fetching data from an API
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
                 setMarketData(dummyMarketData); // Use dummy data
@@ -100,7 +109,7 @@ const MarketInformation = () => {
         item.product.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getTrendIcon = (trend) => {
+    const getTrendIcon = (trend: MarketItem['trend']) => {
         const trendClasses = {
             Increasing: 'text-green-500',
             Decreasing: 'text-red-500 rotate-180',

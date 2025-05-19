@@ -1,17 +1,14 @@
 import axios from "axios";
 
-const API_KEY = 'a09076109c83b6df30bacf1ff2d2e96e'; // Replace with your actual API key
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
-
 // Function to fetch temperature for a given location
 export const fetchTemperature = async (lat: number, lon: number) => {
   try {
-    const response = await axios.get(BASE_URL, {
+    const response = await axios.get(import.meta.env.VITE_WEATHER_API_URL, {
       params: {
         lat,
         lon,
         units: "metric", // Use "metric" for Celsius
-        appid: API_KEY,
+        appid: import.meta.env.VITE_WEATHER_API_KEY,
       },
     });
 

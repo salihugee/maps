@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Bar, Pie } from "react-chartjs-2";
-import { companies } from "../data/companies";
 import { markets } from "../data/markets";
-import { lgacrops } from "../data/lgacrops";
+import { Company } from "../types";
+
+interface LGACrops {
+    lga: string;
+    coordinates: [number, number];
+    crops: string[];
+}
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -25,26 +30,91 @@ ChartJS.register(
 );
 
 const Dashboard: React.FC = () => {
-    console.log("Markets Data:", markets);
-    console.log("LGA Crops Data:", lgacrops);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [lgacrops, setLgacrops] = useState<LGACrops[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {                const API_URL = import.meta.env.VITE_API_URL;
+                const [companiesRes, lgaCropsRes] = await Promise.all([
+                    fetch(`${API_URL}/companies`),
+                    fetch(`${API_URL}/lga_crops`)
+                ]);
+
+                if (!companiesRes.ok) throw new Error('Failed to fetch companies');
+                if (!lgaCropsRes.ok) throw new Error('Failed to fetch LGA crops');                const [companiesData, lgaCropsData] = await Promise.all([
+                    companiesRes.json(),
+                    lgaCropsRes.json()
+                ]);                console.log('Companies data:', companiesData);
+                console.log('LGA Crops data:', lgaCropsData);
+
+                // Validate companies data
+                if (!Array.isArray(companiesData)) {
+                    throw new Error('Companies data is not an array');
+                }
+
+                // Validate and transform LGA crops data if needed
+                if (!Array.isArray(lgaCropsData)) {
+                    throw new Error('LGA Crops data is not an array');
+                }
+
+                // Map LGA crops data to match expected format
+                const formattedLgaCrops = lgaCropsData.map(lga => ({
+                    ...lga,
+                    coordinates: Array.isArray(lga.coordinates) ? lga.coordinates : null,
+                    crops: Array.isArray(lga.crops) ? lga.crops : 
+                        typeof lga.crops === 'string' ? lga.crops.split(',').map(c => c.trim()) :
+                        []
+                }));                setCompanies(companiesData);
+                setLgacrops(formattedLgaCrops);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError(err instanceof Error ? err.message : 'Failed to fetch data');
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div className="text-center p-8">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center p-8 text-red-500">Error: {error}</div>;
+    }    // Log data before processing
+    console.log('Processing companies:', companies);
+    console.log('Processing lgacrops:', lgacrops);
 
     // Summarize Companies by Category
     const companiesByCategory = companies.reduce((acc, company) => {
-        acc[company.category] = (acc[company.category] || 0) + 1;
+        console.log('Processing company:', company);
+        if (company && company.category) {
+            acc[company.category] = (acc[company.category] || 0) + 1;
+        }
         return acc;
     }, {} as { [key: string]: number });
+
+    console.log('Companies by category:', companiesByCategory);
 
     // Summarize Markets by LGA
     const marketsByLGA = markets.reduce((acc, market) => {
         acc[market.lga] = (acc[market.lga] || 0) + 1;
         return acc;
-    }, {} as { [key: string]: number });
-
-    // Summarize Crops by LGA
+    }, {} as { [key: string]: number });    // Summarize Crops by LGA
     const cropsByLGA = lgacrops.reduce((acc, lga) => {
-        acc[lga.lga] = lga.crops.length;
+        console.log('Processing LGA:', lga);
+        if (lga && lga.lga && Array.isArray(lga.crops)) {
+            acc[lga.lga] = lga.crops.length;
+        }
         return acc;
     }, {} as { [key: string]: number });
+
+    console.log('Crops by LGA:', cropsByLGA);
 
     // Summarize Crop Distribution
     const cropDistribution = lgacrops.reduce((acc, lga) => {
@@ -199,7 +269,6 @@ const Dashboard: React.FC = () => {
                         <thead>
                             <tr className="bg-gray-200 text-gray-700">
                                 <th className="px-4 py-2 text-left">LGA</th>
-                                <th className="px-4 py-2 text-left">Coordinates</th>
                                 <th className="px-4 py-2 text-left">Crops</th>
                             </tr>
                         </thead>
@@ -208,12 +277,9 @@ const Dashboard: React.FC = () => {
                                 <tr
                                     key={index}
                                     className={`border-t ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-                                >
-                                    <td className="px-4 py-2">{lga.lga}</td>
-                                    <td className="px-4 py-2">
-                                        [{lga.coordinates[0]}, {lga.coordinates[1]}]
-                                    </td>
-                                    <td className="px-4 py-2">{lga.crops.join(", ")}</td>
+                                >                                    <td className="px-4 py-2">{lga.lga}</td>
+                                    
+                                    <td className="px-4 py-2">{Array.isArray(lga.crops) ? lga.crops.join(", ") : 'N/A'}</td>
                                 </tr>
                             ))}
                         </tbody>

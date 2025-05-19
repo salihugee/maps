@@ -1,7 +1,7 @@
-// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\NotFound.jsx
+// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\NotFound.tsx
 import React from 'react';
 
-const NotFound = () => {
+const NotFound: React.FC = () => {
     return (
         <div className="text-center py-10">
             <h2 className="text-4xl font-bold text-red-600 mb-4">404 - Page Not Found</h2>

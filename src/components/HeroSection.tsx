@@ -1,7 +1,7 @@
-// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\HeroSection.jsx
+// filepath: c:\xampp\htdocs\agriculture_app\resources\js\components\HeroSection.tsx
 import React from 'react';
 
-const HeroSection = () => {
+const HeroSection: React.FC = () => {
     return (
         <section className="bg-green-100 py-10">
             <div className="container mx-auto px-4 text-center">
