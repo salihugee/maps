@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, LayersControl, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import * as L from "leaflet";
 import { lgas } from "../data/lgas";
 import { getWeatherData } from "../services/weather";
 import { getCompanies } from "../services/api";
@@ -16,6 +16,8 @@ import { lgacrops } from "../data/lgacrops";
 import markets from "../data/markets";
 import Sidebar from "../components/Sidebar";
 import IrrigationSchemesToggleControl from "../components/IrrigationSchemes";
+import "leaflet-plugins/layer/vector/KML"; // <-- This enables L.KML
+import type { MarkerCluster } from "leaflet";
 // import { Company } from "../types";
 
 // Custom Control Component for Clustering Toggle
@@ -53,7 +55,7 @@ const ClusteringToggleControl: React.FC<{
     text.style.color = "#333"; // Ensure text is visible
     text.style.cursor = "pointer";
 
-    const customControl = L.control({ position: "topright" });
+    const customControl = new L.Control({ position: "topright" });
     customControl.onAdd = () => controlDiv;
     customControl.addTo(map);
 
@@ -71,12 +73,17 @@ const AddKmlLayer = () => {
 
   useEffect(() => {
     const fetchKml = async () => {
-      const response = await fetch("/kaduna.kml"); // Path to the KML file in the public folder
-      const kmlText = await response.text();
-      const parser = new DOMParser();
-      const kml = parser.parseFromString(kmlText, "text/xml");
-      const kmlLayer = new L.KML(kml);
-      map.addLayer(kmlLayer);
+      try {
+        const response = await fetch("/kaduna.kml"); // File in public/
+        const kmlText = await response.text();
+        const parser = new DOMParser();
+        const kml = parser.parseFromString(kmlText, "text/xml");
+        const kmlLayer = new L.KML(kml);
+        map.addLayer(kmlLayer);
+        map.fitBounds(kmlLayer.getBounds());
+      } catch (err) {
+        console.error("Failed to load KML:", err);
+      }
     };
 
     fetchKml();
@@ -192,10 +199,24 @@ const marketIcon = L.icon({
   popupAnchor: [0, -32], // Position the popup relative to the icon
 });
 
-const createClusterCustomIcon = (cluster: L.MarkerCluster) => {
-  const count = cluster.getChildCount(); // Get the number of markers in the cluster
+const createClusterCustomIcon = (cluster: MarkerCluster) => {
+  const count = cluster.getChildCount();
   return L.divIcon({
-    html: `<div style="background-color: #4CAF50; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">${count}</div>`,
+    html: `
+      <div style="
+        background-color: #4CAF50; 
+        color: white; 
+        border-radius: 50%; 
+        width: 40px; 
+        height: 40px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 14px; 
+        font-weight: bold;
+      ">
+        ${count}
+      </div>`,
     className: "custom-cluster-icon",
     iconSize: [40, 40],
   });
@@ -241,7 +262,13 @@ const Map = () => {
           return true;
         });
 
-        setCompanies(validCompanies);
+        // Convert id to number to match local Company interface
+        const normalizedCompanies = validCompanies.map(company => ({
+          ...company,
+          id: typeof company.id === "string" ? parseInt(company.id, 10) : company.id,
+        }));
+
+        setCompanies(normalizedCompanies);
         setError(null);
       } catch (error) {
         console.error("Error fetching companies:", error);
@@ -493,7 +520,7 @@ const Map = () => {
               {filteredCompanies.map((company) => (
                 <Marker
                   key={company.id}
-                  position={company.coordinates}
+                  position={company.coordinates as [number, number]}
                   icon={categoryIcons[company.category] || categoryIcons.Default}
                   eventHandlers={{
                     click: () => setSelectedCompany(company),
@@ -514,7 +541,7 @@ const Map = () => {
             filteredCompanies.map((company) => (
               <Marker
                 key={company.id}
-                position={company.coordinates}
+                position={company.coordinates as [number, number]}
                 icon={categoryIcons[company.category] || categoryIcons.Default}
                 eventHandlers={{
                   click: () => setSelectedCompany(company),

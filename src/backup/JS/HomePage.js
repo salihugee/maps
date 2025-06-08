@@ -1,0 +1,23 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navigation from './Navigation';
+import HeroSection from './HeroSection';
+import SeasonalFarmingTips from './SeasonalFarmingTips';
+import About from './About';
+import Stakeholders from './Stakeholders';
+import MarketInformation from './MarketInformation';
+import PrecisionFarming from './PrecisionFarming';
+import WeatherInformation from './WeatherInformation';
+import DroneImagery from './DroneImagery';
+import AgriculturalExperts from './AgriculturalExperts';
+import StakeholdersMap from './StakeholdersMap';
+import FarmersForum from './FarmersForum';
+import ResourcesAndTraining from './ResourcesTrainings';
+import FAQs from './FAQCard';
+import Footer from './Footer';
+import NotFound from './NotFound';
+const HomePage = () => {
+    const WelcomeComponent = () => (_jsxs("div", { children: [_jsx("h2", { className: "text-3xl font-bold mb-4", children: "Welcome to the Agriculture App" }), _jsx("p", { className: "text-gray-700", children: "Explore farming tips, best practices, and resources to improve your agricultural productivity." })] }));
+    return (_jsx(Router, { children: _jsxs("div", { className: "min-h-screen bg-gray-100", children: [_jsx(Navigation, {}), _jsx(HeroSection, {}), _jsx("main", { className: "container mx-auto px-4 py-6", children: _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(WelcomeComponent, {}) }), _jsx(Route, { path: "/tips", element: _jsx(SeasonalFarmingTips, {}) }), _jsx(Route, { path: "/about", element: _jsx(About, {}) }), _jsx(Route, { path: "/stakeholders", element: _jsx(Stakeholders, {}) }), _jsx(Route, { path: "/market", element: _jsx(MarketInformation, {}) }), _jsx(Route, { path: "/precision-farming", element: _jsx(PrecisionFarming, {}) }), _jsx(Route, { path: "/weather", element: _jsx(WeatherInformation, {}) }), _jsx(Route, { path: "/drone-imagery", element: _jsx(DroneImagery, {}) }), _jsx(Route, { path: "/experts", element: _jsx(AgriculturalExperts, {}) }), _jsx(Route, { path: "/stakeholders-map", element: _jsx(StakeholdersMap, {}) }), _jsx(Route, { path: "/farmers-forum", element: _jsx(FarmersForum, {}) }), _jsx(Route, { path: "/resources-training", element: _jsx(ResourcesAndTraining, {}) }), _jsx(Route, { path: "/faqs", element: _jsx(FAQs, {}) }), _jsx(Route, { path: "*", element: _jsx(NotFound, {}) })] }) }), _jsx(Footer, {})] }) }));
+};
+export default HomePage;

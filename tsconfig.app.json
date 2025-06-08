@@ -6,6 +6,12 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -13,7 +19,9 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    // "composite": true,
     "jsx": "react-jsx",
+    
 
     /* Linting */
     "strict": true,

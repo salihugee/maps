@@ -8,10 +8,10 @@ import {
     Video,
     LucideIcon
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { motion, Variants } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 // Animation variants
 const cardVariants: Variants = {

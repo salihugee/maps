@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, CloudSnow, CloudRain, Wind, MapPin, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
+import { Cloud, CloudSnow, CloudRain, MapPin, Loader2 } from 'lucide-react'; //Wind
+// import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import { cn } from '../lib/utils';
 
 interface WeatherCondition {
     date: string;

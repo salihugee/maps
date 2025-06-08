@@ -5,8 +5,16 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    // "moduleResolution": "node",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*, .src/@types/custom.d.ts"],
+      // "@app/*": ["./app/*"],
+      // "@assets/*": ["./assets/*"],
+      // "@components/*": ["./src/components/*"],
+      // "@styles/*": ["./styles/*"],
+      // "@utils/*": ["./utils/*"]
     }
   }
+  // "include": ["src", "src/@types/custom.d.ts"]
 }

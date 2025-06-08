@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Users, Phone, Mail, Link, Building2, Loader2, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import { cn } from '../lib/utils';
 
 interface Stakeholder {
     id: number;
@@ -142,6 +142,10 @@ const Stakeholders: React.FC = () => {
                                     </p>
                                     <p className="text-sm text-gray-500 flex items-center gap-1">
                                         <Mail className="h-4 w-4" />
+                                        {stakeholder.email_website}
+                                    </p>
+                                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                                        <Link className="h-4 w-4" />
                                         {stakeholder.email_website}
                                     </p>
                                     <p className="text-sm text-gray-500 flex items-center gap-1">

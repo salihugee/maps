@@ -43,11 +43,17 @@ const Dashboard: React.FC = () => {
                     fetch(`${API_URL}/lga_crops`)
                 ]);
 
-                if (!companiesRes.ok) throw new Error('Failed to fetch companies');
-                if (!lgaCropsRes.ok) throw new Error('Failed to fetch LGA crops');                const [companiesData, lgaCropsData] = await Promise.all([
+                if (!companiesRes.ok) {
+                    throw new Error('Failed to fetch companies');
+                }
+                if (!lgaCropsRes.ok) {
+                    throw new Error('Failed to fetch LGA crops');
+                }
+                const [companiesData, lgaCropsData] = await Promise.all([
                     companiesRes.json(),
                     lgaCropsRes.json()
-                ]);                console.log('Companies data:', companiesData);
+                ]);
+                console.log('Companies data:', companiesData);
                 console.log('LGA Crops data:', lgaCropsData);
 
                 // Validate companies data
@@ -65,7 +71,7 @@ const Dashboard: React.FC = () => {
                     ...lga,
                     coordinates: Array.isArray(lga.coordinates) ? lga.coordinates : null,
                     crops: Array.isArray(lga.crops) ? lga.crops : 
-                        typeof lga.crops === 'string' ? lga.crops.split(',').map(c => c.trim()) :
+                        typeof lga.crops === 'string' ? lga.crops.split(',').map((c: string) => c.trim()) :
                         []
                 }));                setCompanies(companiesData);
                 setLgacrops(formattedLgaCrops);
